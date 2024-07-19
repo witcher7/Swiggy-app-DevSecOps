@@ -182,15 +182,15 @@ pipeline{
                  script{
                     withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker'){   
                         sh "docker build -t swiggy-clone ."
-                        sh "docker tag swiggy-clone ashfaque9x/swiggy-clone:latest "
-                        sh "docker push ashfaque9x/swiggy-clone:latest "
+                        sh "docker tag swiggy-clone rg7121/swiggy-cicd:latest "
+                        sh "docker push rg7121/swiggy-cicd:latest "
                      }
                  }
              }
          }
          stage("TRIVY"){
              steps{
-                 sh "trivy image ashfaque9x/swiggy-clone:latest > trivyimage.txt" 
+                 sh "trivy image rg7121/swiggy-cicd:latest > trivyimage.txt" 
              }
          }
           stage('Deploy to Kubernets'){
