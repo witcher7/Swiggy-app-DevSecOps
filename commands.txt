@@ -130,149 +130,86 @@ $ kubectl get nodes
 $ kubectl get svc
 =============================================================================================================================================================================================
 1--Jenkins Pipeline Script
-pipeline{
-     agent any
-     
-     tools{
-         jdk 'jdk17'
-         nodejs 'node16'
-     }
-     environment {
-         SCANNER_HOME=tool 'sonarqube-scanner'
-     }
-     
-     stages {
-         stage('Clean Workspace'){
-             steps{
-                 cleanWs()
-             }
-         }
-         stage('Checkout from Git'){
-             steps{
-                 git branch: 'main', url: 'https://github.com/Ashfaque-9x/a-swiggy-clone.git'
-             }
-         }
-         stage("Sonarqube Analysis "){
-             steps{
-                 withSonarQubeEnv('SonarQube-Server') {
-                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Swiggy-CI \
-                     -Dsonar.projectKey=Swiggy-CI '''
-                 }
-             }
-         }
-         stage("Quality Gate"){
+pipeline {
+    agent any
+    
+    tools {
+        jdk 'jdk17'
+        nodejs 'node16'
+    }
+    
+    environment {
+        SCANNER_HOME = tool 'sonarqube-scanner'
+    }
+    
+    stages {
+        stage('Clean Workspace') {
             steps {
-                 script {
-                     waitForQualityGate abortPipeline: false, credentialsId: 'SonarQube-Token' 
-                 }
-             } 
-         }
-         stage('Install Dependencies') {
-             steps {
-                 sh "npm install"
-             }pipeline{
-     agent any
-     
-     tools{
-         jdk 'jdk17'
-         nodejs 'nodejs'
-     }
-     environment {
-         SCANNER_HOME=tool 'sonarqube-scanner'
-     }
-     
-     stages {
-         stage('Clean Workspace'){
-             steps{
-                 cleanWs()
-             }
-         }
-         stage('Checkout from Git'){
-             steps{
-                 git branch: 'main', url: 'https://github.com/Ashfaque-9x/a-swiggy-clone.git'
-             }
-         }
-         stage("Sonarqube Analysis "){
-             steps{
-                 withSonarQubeEnv('SonarQube-Server') {
-                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Swiggy-CI \
-                     -Dsonar.projectKey=Swiggy-CI '''
-                 }
-             }
-         }
-         stage("Quality Gate"){
+                cleanWs()
+            }
+        }
+        stage('Checkout from Git') {
             steps {
-                 script {
-                     waitForQualityGate abortPipeline: false, credentialsId: 'SonarQube-Token' 
-                 }
-             } 
-         }
-         stage('Install Dependencies') {
-             steps {
-                 sh "npm install"
-             }
-         }
-         stage('TRIVY FS SCAN') {
-             steps {
-                 sh "trivy fs . > trivyfs.txt"
-             }
-         }
-          stage("Docker Build & Push"){
-             steps{
-                 script{
-                    withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker'){   
+                git branch: 'main', url: 'https://github.com/Ashfaque-9x/a-swiggy-clone.git'
+            }
+        }
+        stage("Sonarqube Analysis") {
+            steps {
+                withSonarQubeEnv('SonarQube-Server') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Swiggy-CI \
+                    -Dsonar.projectKey=Swiggy-CI '''
+                }
+            }
+        }
+        stage("Quality Gate") {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'SonarQube-Token'
+                }
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh "npm install"
+            }
+        }
+        stage('TRIVY FS SCAN') {
+            steps {
+                sh "trivy fs . > trivyfs.txt"
+            }
+        }
+        stage("Docker Build & Push") {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker') {
                         sh "docker build -t swiggy-clone ."
-                        sh "docker tag swiggy-clone ashfaque9x/swiggy-clone:latest "
-                        sh "docker push ashfaque9x/swiggy-clone:latest "
-                     }
-                 }
-             }
-         }
-         stage("TRIVY"){
-             steps{
-                 sh "trivy image ashfaque9x/swiggy-clone:latest > trivyimage.txt" 
-             }
-         }
-         }
-         stage('TRIVY FS SCAN') {
-             steps {
-                 sh "trivy fs . > trivyfs.txt"
-             }
-         }
-          stage("Docker Build & Push"){
-             steps{
-                 script{
-                    withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker'){   
-                        sh "docker build -t swiggy-clone ."
-                        sh "docker tag swiggy-clone rg7121/swiggy-cicd:latest "
-                        sh "docker push rg7121/swiggy-cicd:latest "
-                     }
-                 }
-             }
-         }
-         stage("TRIVY"){
-             steps{
-                 sh "trivy image rg7121/swiggy-cicd:latest > trivyimage.txt" 
-             }
-         }
-          stage('Deploy to Kubernets'){
-             steps{
-                 script{
-                     dir('Kubernetes') {
-                         kubeconfig(credentialsId: 'kubernetes', serverUrl: '') {
-                         sh 'kubectl delete --all pods'
-                         sh 'kubectl apply -f deployment.yml'
-                         sh 'kubectl apply -f service.yml'
-                         }   
-                     }
-                 }
-             }
-         }
+                        sh "docker tag swiggy-clone rg7121/swiggy-cicd:latest"
+                        sh "docker push rg7121/swiggy-cicd:latest"
+                    }
+                }
+            }
+        }
+        stage("TRIVY") {
+            steps {
+                sh "trivy image rg7121/swiggy-cicd:latest > trivyimage.txt"
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    dir('Kubernetes') {
+                        kubeconfig(credentialsId: 'kubernetes', serverUrl: '') {
+                            sh 'kubectl delete --all pods'
+                            sh 'kubectl apply -f deployment.yml'
+                            sh 'kubectl apply -f service.yml'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
-
-
-     }
- }
 =============================================================================================================================================================================================
 Cleanup
 1--Delete EKS Cluster
