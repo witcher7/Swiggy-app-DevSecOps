@@ -197,7 +197,7 @@ function RestaurentOnline() {
                             }} className='Online-Card-img '>
                                 <div className='Online-color'><h4 className='fw-bolder' >10% OFF UPTO ₹40</h4></div>
                             </div>
-                            <h5 className='mt-3'>Al-Sheba Kuzhimandhi</h5>
+                            <h5 className='mt-3'>Al Sheba Kuzhimandhi</h5>
                             <i style={{ color: "#20963a" }} className="fa-solid fa-star"></i>4.1
                             <p style={{ fontWeight: "300" }}>Arabian, Beverages <br />Kakkanad</p>
                         </div>
