@@ -1,8 +1,1 @@
-Deploying the Swiggy clone app with Terraform, Kubernetes, and Jenkins CICD.
-Test200
-this is a CICD project for DevSecOps where security tools are implemented --> Trivy scan and Sonarqube gates for security purpose
-DONE1
-!!!!!
-
-
-
+This project demonstrates a robust DevOps pipeline with integrated DevSecOps practices, ensuring secure, scalable, and efficient application deployment. The application, built with a Node.js backend and React frontend, is containerized using Docker and orchestrated with Kubernetes on AWS for scalability and fault tolerance. Infrastructure provisioning is automated with Terraform, while Helm charts simplify and standardize Kubernetes deployments. A Jenkins-powered CI/CD pipeline automates testing, building, containerization, and deployment, streamlining the development lifecycle. Security is a key focus, with Trivy performing container vulnerability scans and SonarQube ensuring code quality and identifying security issues. Ansible automates configuration management for consistent environments, and Prometheus provides real-time monitoring and alerting to maintain system health. The integration of these tools and practices creates a seamless, secure, and efficient workflow for deploying cloud-native applications while adhering to modern DevOps and DevSecOps standards.
